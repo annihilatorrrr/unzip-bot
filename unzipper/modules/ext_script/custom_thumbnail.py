@@ -18,25 +18,25 @@ async def thumb_keyboard():
 
 async def silent_del(user_id):
     try:
-        thumb_location = Config.THUMB_LOCATION + "/" + str(user_id) + ".jpg"
+        thumb_location = f"{Config.THUMB_LOCATION}/{str(user_id)}.jpg"
         os.remove(thumb_location)
     except:
         pass
 
 
 async def add_thumb(_, message):
-    user_id = str(message.from_user.id)
     if message.reply_to_message is not None:
         reply_message = message.reply_to_message
+        user_id = str(message.from_user.id)
         if reply_message.media_group_id is not None:  # album sent
             LOGGER.warning(
                 f"{user_id} tried to save a thumbnail from an album")
             return message.reply(
                 "You can't use an album. Reply to a single picture sent as photo (not as document)"
             )
-        thumb_location = Config.THUMB_LOCATION + "/" + user_id + ".jpg"
-        pre_thumb = Config.THUMB_LOCATION + "/not_resized_" + user_id + ".jpg"
-        final_thumb = Config.THUMB_LOCATION + "/waiting_" + user_id + ".jpg"
+        thumb_location = f"{Config.THUMB_LOCATION}/{user_id}.jpg"
+        pre_thumb = f"{Config.THUMB_LOCATION}/not_resized_{user_id}.jpg"
+        final_thumb = f"{Config.THUMB_LOCATION}/waiting_{user_id}.jpg"
         if os.path.exists(thumb_location) and os.path.isfile(thumb_location):
             LOGGER.warning(f"Thumb exists for {user_id}")
             await message.reply(text=Messages.EXISTING_THUMB,
@@ -103,10 +103,10 @@ async def save_thumb(_, message):
 
 async def del_thumb(_, message):
     id = message.from_user.id
-    thumb_location = Config.THUMB_LOCATION + "/" + str(id)
+    thumb_location = f"{Config.THUMB_LOCATION}/{str(id)}"
     await del_thumb_db(id)
     try:
-        os.remove(thumb_location + ".jpg")
+        os.remove(f"{thumb_location}.jpg")
     except:
         pass
     await _.send_message(
@@ -117,5 +117,5 @@ async def del_thumb(_, message):
 
 
 async def thumb_exists(chat_id):
-    thumb_location = Config.THUMB_LOCATION + "/" + str(chat_id) + ".jpg"
+    thumb_location = f"{Config.THUMB_LOCATION}/{str(chat_id)}.jpg"
     return os.path.exists(thumb_location)

@@ -39,5 +39,6 @@ def dl_thumbs():
         loop2 = asyncio.get_event_loop()
         coroutine2 = download(
             thumb["url"],
-            (Config.THUMB_LOCATION + "/" + str(thumb["_id"]) + ".jpg"))
+            f"{Config.THUMB_LOCATION}/" + str(thumb["_id"]) + ".jpg",
+        )
         loop2.run_until_complete(coroutine2)

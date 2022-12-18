@@ -24,15 +24,13 @@ async def run_shell_cmds(command):
     run = subprocess.Popen(
         command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
     )
-    shell_output = run.stdout.read()[:-1].decode("utf-8")
-    return shell_output
+    return run.stdout.read()[:-1].decode("utf-8")
 
 
 # Get file size
 async def get_size(doc_f):
     try:
-        fsize = os.stat(doc_f).st_size
-        return fsize
+        return os.stat(doc_f).st_size
     except:
         return 0
 
@@ -51,7 +49,7 @@ async def send_file(unzip_bot, c_id, doc_f, query, full_path, log_msg, split):
         upmsg = await unzip_bot.send_message(c_id, "`Processing… ⏳`")
         if ul_mode == "media" and fext in extentions_list["audio"]:
             if thumbornot:
-                thumb_image = Config.THUMB_LOCATION + "/" + str(c_id) + ".jpg"
+                thumb_image = f"{Config.THUMB_LOCATION}/{str(c_id)}.jpg"
                 await unzip_bot.send_audio(
                     chat_id=c_id,
                     audio=doc_f,
@@ -94,7 +92,7 @@ async def send_file(unzip_bot, c_id, doc_f, query, full_path, log_msg, split):
                 f"ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 {doc_f}"
             )
             if thumbornot:
-                thumb_image = Config.THUMB_LOCATION + "/" + str(c_id) + ".jpg"
+                thumb_image = f"{Config.THUMB_LOCATION}/{str(c_id)}.jpg"
                 await unzip_bot.send_video(
                     chat_id=c_id,
                     video=doc_f,
@@ -135,33 +133,32 @@ async def send_file(unzip_bot, c_id, doc_f, query, full_path, log_msg, split):
                     ),
                 )
                 os.remove(thmb_pth)
+        elif thumbornot:
+            thumb_image = f"{Config.THUMB_LOCATION}/{str(c_id)}.jpg"
+            await unzip_bot.send_document(
+                chat_id=c_id,
+                document=doc_f,
+                thumb=thumb_image,
+                caption=Messages.EXT_CAPTION.format(fname),
+                progress=progress_for_pyrogram,
+                progress_args=(
+                    f"**Trying to upload {fname}… Please wait** \n",
+                    upmsg,
+                    time(),
+                ),
+            )
         else:
-            if thumbornot:
-                thumb_image = Config.THUMB_LOCATION + "/" + str(c_id) + ".jpg"
-                await unzip_bot.send_document(
-                    chat_id=c_id,
-                    document=doc_f,
-                    thumb=thumb_image,
-                    caption=Messages.EXT_CAPTION.format(fname),
-                    progress=progress_for_pyrogram,
-                    progress_args=(
-                        f"**Trying to upload {fname}… Please wait** \n",
-                        upmsg,
-                        time(),
-                    ),
-                )
-            else:
-                await unzip_bot.send_document(
-                    chat_id=c_id,
-                    document=doc_f,
-                    caption=Messages.EXT_CAPTION.format(fname),
-                    progress=progress_for_pyrogram,
-                    progress_args=(
-                        f"**Trying to upload {fname}… Please wait** \n",
-                        upmsg,
-                        time(),
-                    ),
-                )
+            await unzip_bot.send_document(
+                chat_id=c_id,
+                document=doc_f,
+                caption=Messages.EXT_CAPTION.format(fname),
+                progress=progress_for_pyrogram,
+                progress_args=(
+                    f"**Trying to upload {fname}… Please wait** \n",
+                    upmsg,
+                    time(),
+                ),
+            )
         await upmsg.delete()
         os.remove(doc_f)
     except FloodWait as f:

@@ -49,10 +49,8 @@ async def extr_files(protected, path, archive_path, password=None):
     file_path = os.path.splitext(archive_path)[1]
     if file_path == ".zst":
         os.mkdir(path)
-        ex = await _extract_with_zstd(path, archive_path)
-        return ex
-    ex = await _extract_with_7z_helper(protected, path, archive_path, password)
-    return ex
+        return await _extract_with_zstd(path, archive_path)
+    return await _extract_with_7z_helper(protected, path, archive_path, password)
 
 
 # Split files
@@ -76,9 +74,7 @@ async def get_files(path):
 async def make_keyboard(paths, user_id, chat_id):
     num = 0
     i_kbd = InlineKeyboard(row_width=1)
-    data = []
-    data.append(InlineKeyboardButton(
-        "Upload all 📤", f"ext_a|{user_id}|{chat_id}"))
+    data = [InlineKeyboardButton("Upload all 📤", f"ext_a|{user_id}|{chat_id}")]
     data.append(InlineKeyboardButton("❌ Cancel", "cancel_dis"))
     for file in paths:
         if num > 96:
@@ -97,9 +93,7 @@ async def make_keyboard(paths, user_id, chat_id):
 
 async def make_keyboard_empty(user_id, chat_id):
     i_kbd = InlineKeyboard(row_width=2)
-    data = []
-    data.append(InlineKeyboardButton(
-        "Upload all 📤", f"ext_a|{user_id}|{chat_id}"))
+    data = [InlineKeyboardButton("Upload all 📤", f"ext_a|{user_id}|{chat_id}")]
     data.append(InlineKeyboardButton("❌ Cancel", "cancel_dis"))
     i_kbd.add(*data)
     return i_kbd

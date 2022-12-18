@@ -33,14 +33,11 @@ async def del_user(user_id):
 async def is_user_in_db(user_id):
     u_id = int(user_id)
     is_exist = await user_db.find_one({"user_id": u_id})
-    if is_exist:
-        return True
-    return False
+    return bool(is_exist)
 
 
 async def count_users():
-    users = await user_db.count_documents({})
-    return users
+    return await user_db.count_documents({})
 
 
 async def get_users_list():
@@ -71,14 +68,11 @@ async def del_banned_user(user_id):
 async def is_user_in_bdb(user_id):
     u_id = int(user_id)
     is_exist = await b_user_db.find_one({"banned_user_id": u_id})
-    if is_exist:
-        return True
-    return False
+    return bool(is_exist)
 
 
 async def count_banned_users():
-    users = await b_user_db.count_documents({})
-    return users
+    return await b_user_db.count_documents({})
 
 
 async def get_banned_users_list():
@@ -121,8 +115,8 @@ async def check_user(message):
                 lastname = " "
             if username is None:
                 username = " "
-            uname = firstname + " " + lastname
-            umention = " | @" + username
+            uname = f"{firstname} {lastname}"
+            umention = f" | @{username}"
         try:
             await Client.send_message(
                 chat_id=Config.LOGS_CHANNEL,
@@ -162,9 +156,7 @@ async def set_upload_mode(user_id, mode):
 
 async def get_upload_mode(user_id):
     umode = await mode_db.find_one({"_id": user_id})
-    if umode:
-        return umode["mode"]
-    return "media"
+    return umode["mode"] if umode else "media"
 
 
 # Db for how many files user uploaded
@@ -173,9 +165,7 @@ uploaded_db = unzipper_db["uploaded_count_db"]
 
 async def get_uploaded(user_id):
     up_count = await uploaded_db.find_one({"_id": user_id})
-    if up_count:
-        return up_count["uploaded_files"]
-    return 0
+    return up_count["uploaded_files"] if up_count else 0
 
 
 async def update_uploaded(user_id, upload_count):
@@ -207,9 +197,7 @@ thumb_db = unzipper_db["thumb_db"]
 
 async def get_thumb(user_id):
     existing = await thumb_db.find_one({"_id": user_id})
-    if existing:
-        return existing["url"]
-    return None
+    return existing["url"] if existing else None
 
 
 async def update_thumb(user_id, thumb_url, force):
@@ -239,8 +227,7 @@ async def get_thumb_users():
 
 
 async def count_thumb_users():
-    users = await thumb_db.count_documents({})
-    return users
+    return await thumb_db.count_documents({})
 
 async def del_thumb_db(user_id):
     del_thumb_id = int(user_id)

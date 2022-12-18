@@ -13,8 +13,6 @@ async def jsonized(command):
         shell_output.replace("true", "True")
     elif "false" in shell_output:
         shell_output.replace("false", "False")
-    else:
-        pass
     try:
         return json.loads(shell_output)
     except:
